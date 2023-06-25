@@ -1,101 +1,94 @@
+import CartFooter from "../CartFooter";
 import CartHeader from "../CartHeader";
+import Product from "../Product";
+import data from "./../../data"
+import { useEffect, useState } from "react";
 
 const Cart = () => {
+
+    const [cart, setCart] = useState(data);
+    const [total, setTotal] = useState({
+        price: cart.reduce((prev, curr) => prev + curr.priceTotal, 0),
+        count: cart.reduce((prev, curr) => prev + curr.count, 0),
+    });
+
+    useEffect(() => {
+        setTotal({
+            price: cart.reduce((prev, curr) => prev + curr.priceTotal, 0),
+            count: cart.reduce((prev, curr) => prev + curr.count, 0),
+        })
+    }, [cart]);
+
+    const deliteProduct = (id) => {
+        setCart((cart) => cart.filter((product) => id !== product.id));
+    };
+
+    const increase = (id) => {
+        setCart((cart) => {
+            return  cart.map((product) => {
+                if (product.id === id) {
+                    return {
+                        ...product,
+                        count: ++product.count,
+                        priceTotal: product.count * product.price
+                    };
+                } else {
+                    return product;
+                }
+            });
+        });
+    };
+
+    const decrease = (id) => {
+        setCart((cart) => {
+            return  cart.map((product) => {
+                if (product.id === id) {
+                    return {
+                        ...product,
+                        count: product.count -1 > 1 ? product.count - 1 : 1,
+                        priceTotal: (product.count -1 > 1 ? --product.count : 1) * product.price
+                    };
+                } else {
+                    return product;
+                }
+            });
+        });
+    };
+
+    const chengeValue = (id, value) => {
+        setCart((cart) => {
+            return cart.map((product) => {
+                if (product.id === id) {
+                    return {
+                        ...product,
+                        count: value,
+                        priceTotal: value * product.price
+                    };
+                } else {
+                    return product;
+                }
+            })
+        })
+    };
+
+    const products = cart.map((product) => {
+        return <Product 
+            product={product} 
+            key={product.id} 
+            deliteProduct={deliteProduct} 
+            increase={increase} 
+            decrease={decrease} 
+            chengeValue={chengeValue}
+        />;
+    });
+
 	return ( 
 		<section className="cart">
-                    <CartHeader />
-                    
-                    <header className="cart-header">
-                        <div className="cart-header__title">наименование</div>
-                        <div className="cart-header__count">количество</div>
-                        <div className="cart-header__cost">стоимость</div>
-                    </header>
-
-                    <section className="product">
-                        <div className="product__img"><img src="./img/products/macbook.jpg" alt="Apple MacBook Air 13" /></div>
-                        <div className="product__title">Apple MacBook Air 13</div>
-                        <div className="product__count">
-                            <div className="count">
-                                <div className="count__box">
-                                    <input type="number" className="count__input" min="1" max="100" value="1" />
-                                </div>
-                                <div className="count__controls">
-                                    <button type="button" className="count__up">
-                                        <img src="./img/icons/icon-up.svg" alt="Increase" />
-                                    </button>
-                                    <button type="button" className="count__down">
-                                        <img src="./img/icons/icon-down.svg" alt="Decrease" />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product__price">110 000 руб.</div>
-                        <div className="product__controls">
-                            <button type="button">
-                                <img src="./img/icons/cross.svg" alt="Delete" />
-                            </button>
-                        </div>
-                    </section>
-
-                    {/* <section className="product">
-                        <div className="product__img"><img src="./img/products/apple-watch.jpg" alt="Apple watch" /></div>
-                        <div className="product__title">Apple watch</div>
-                        <div className="product__count">
-                            <div className="count">
-                                <div className="count__box">
-                                    <input type="number" className="count__input" min="1" max="100" value="1" />
-                                </div>
-                                <div className="count__controls">
-                                    <button type="button" className="count__up">
-                                        <img src="./img/icons/icon-up.svg" alt="Increase" />
-                                    </button>
-                                    <button type="button" className="count__down">
-                                        <img src="./img/icons/icon-down.svg" alt="Decrease" />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product__price">29 000 руб.</div>
-                        <div className="product__controls">
-                            <button type="button">
-                                <img src="./img/icons/cross.svg" alt="Delete" />
-                            </button>
-                        </div>
-                    </section>
-
-                    <section className="product">
-                        <div className="product__img"><img src="./img/products/mac-pro.jpg" alt="Mac Pro" /></div>
-                        <div className="product__title">Mac Pro</div>
-                        <div className="product__count">
-                            <div className="count">
-                                <div className="count__box">
-                                    <input type="number" className="count__input" min="1" max="100" value="1" />
-                                </div>
-                                <div className="count__controls">
-                                    <button type="button" className="count__up">
-                                        <img src="./img/icons/icon-up.svg" alt="Increase" />
-                                    </button>
-                                    <button type="button" className="count__down">
-                                        <img src="./img/icons/icon-down.svg" alt="Decrease" />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product__price">190 000 руб.</div>
-                        <div className="product__controls">
-                            <button type="button">
-                                <img src="./img/icons/cross.svg" alt="Delete" />
-                            </button>
-                        </div>
-                    </section> */}
-
-
-                    <footer className="cart-footer">
-                        <div className="cart-footer__count">3 единицы</div>
-                        <div className="cart-footer__price">329 000 руб.</div>
-                    </footer>
-                </section>
+            <CartHeader />
+            {products}
+            <CartFooter total={total}/>
+        </section>
 	);
-}
+};
  
-export default Cart;
+export default Cart; 
